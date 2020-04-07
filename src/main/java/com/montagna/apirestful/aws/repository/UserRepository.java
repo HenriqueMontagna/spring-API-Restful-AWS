@@ -11,7 +11,7 @@ import com.montagna.apirestful.aws.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
 
-	@Query("SELECT FROM user WHERE email = ?1 AND password = ?2")
+	@Query("SELECT u FROM user u WHERE email = ?1 AND password = ?2")
 	public Optional<User> login(String email, String password);
 	
 }
