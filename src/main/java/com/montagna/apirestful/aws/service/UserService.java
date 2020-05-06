@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.montagna.apirestful.aws.domain.User;
+import com.montagna.apirestful.aws.exception.NotFoundException;
 import com.montagna.apirestful.aws.repository.UserRepository;
 import com.montagna.apirestful.aws.service.util.HashUtil;
 
@@ -33,7 +34,7 @@ public class UserService {
 	
 	public User getById(Long id) {
 		Optional<User> user = repo.findById(id);
-		return user.get();
+		return user.orElseThrow(() -> new NotFoundException("Não foi possivel encontrar usuário com o Id = "+id));
 	}
 
 	public List<User> listAll(){
