@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.montagna.apirestful.aws.domain.RequestStage;
 import com.montagna.apirestful.aws.domain.enums.RequestState;
+import com.montagna.apirestful.aws.exception.NotFoundException;
 import com.montagna.apirestful.aws.repository.RequestRepository;
 import com.montagna.apirestful.aws.repository.RequestStageRepository;
 
@@ -36,7 +37,7 @@ public class RequestStageService {
 	
 	public RequestStage getById(Long id) {
 		Optional<RequestStage> result = requestStageRepo.findById(id);
-		return result.get();
+		return result.orElseThrow(() -> new NotFoundException("Não foi possivel encontrar stage com o Id = "+id));
 	}
 	
 	public List<RequestStage> listAllByRequestId(Long id){
