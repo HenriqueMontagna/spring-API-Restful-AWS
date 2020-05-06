@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.montagna.apirestful.aws.domain.Request;
 import com.montagna.apirestful.aws.domain.enums.RequestState;
+import com.montagna.apirestful.aws.exception.NotFoundException;
 import com.montagna.apirestful.aws.repository.RequestRepository;
 
 @Service
@@ -31,7 +32,7 @@ public class RequestService {
 	
 	public Request getById(Long id) {
 		Optional<Request> request = repo.findById(id);
-		return request.get();
+		return request.orElseThrow(() -> new NotFoundException("Não foi possivel encontrar request com o Id = "+id));
 	}
 	
 	public List<Request> listAll() {
