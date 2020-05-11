@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.montagna.apirestful.aws.DTO.UserLoginDTO;
 import com.montagna.apirestful.aws.domain.Request;
 import com.montagna.apirestful.aws.domain.User;
+import com.montagna.apirestful.aws.model.PageModel;
+import com.montagna.apirestful.aws.model.PageRequestModel;
 import com.montagna.apirestful.aws.service.RequestService;
 import com.montagna.apirestful.aws.service.UserService;
 
@@ -49,9 +52,14 @@ public class UserResource {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<User>> listAll(){
-		List<User> users = userService.listAll();
-		return ResponseEntity.ok(users);
+	public ResponseEntity<PageModel<User>> listAll(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size){
+		
+		PageRequestModel pr = new PageRequestModel(page, size);
+		PageModel<User> pm = userService.listAllOnLazyMode(pr);
+		
+		return ResponseEntity.ok(pm);
 	}
 	
 	@GetMapping("/{userId}/requests")
