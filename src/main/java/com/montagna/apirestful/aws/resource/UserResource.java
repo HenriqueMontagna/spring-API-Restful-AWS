@@ -3,6 +3,7 @@ package com.montagna.apirestful.aws.resource;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +53,7 @@ public class UserResource {
 	}
 	
 	@GetMapping
-	public ResponseEntity<PageModel<User>> listAll(
+	public ResponseEntity<PageModel<User>> listAllOnLazyMode(
 			@RequestParam(name = "page") int page,
 			@RequestParam(name = "size") int size){
 		
@@ -63,10 +64,17 @@ public class UserResource {
 	}
 	
 	@GetMapping("/{userId}/requests")
-	public ResponseEntity<List<Request>> listAllRequestsById(@PathVariable("userId") Long id){
-		List<Request> requests = requestService.listByOwnerId(id);
-		return ResponseEntity.ok(requests);
+	public ResponseEntity<PageModel<Request>> listAllRequestsById(
+			@PathVariable("userId") Long id,
+			@RequestParam("page") int page,
+			@RequestParam("size") int size){
+		
+		PageRequestModel pr = new PageRequestModel(page, size);
+		PageModel<Request> pm = requestService.listByOwnerIdOnLazyLoading(id, pr);
+		
+		return ResponseEntity.ok(pm);
 	}
+	
 	
 	@PostMapping(value = "/login")
 	public ResponseEntity<User> login(@RequestBody UserLoginDTO user){

@@ -5,11 +5,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.montagna.apirestful.aws.domain.RequestStage;
 import com.montagna.apirestful.aws.domain.enums.RequestState;
 import com.montagna.apirestful.aws.exception.NotFoundException;
+import com.montagna.apirestful.aws.model.PageModel;
+import com.montagna.apirestful.aws.model.PageRequestModel;
 import com.montagna.apirestful.aws.repository.RequestRepository;
 import com.montagna.apirestful.aws.repository.RequestStageRepository;
 
@@ -40,9 +45,12 @@ public class RequestStageService {
 		return result.orElseThrow(() -> new NotFoundException("Não foi possivel encontrar stage com o Id = "+id));
 	}
 	
-	public List<RequestStage> listAllByRequestId(Long id){
-		List<RequestStage> list = requestStageRepo.findAllByRequestId(id);
-		return list;
+	public PageModel<RequestStage> listAllByRequestIdOnLazyMode(Long requestId, PageRequestModel pr){
+		Pageable pageable = PageRequest.of(pr.getPage(), pr.getSize());
+		Page<RequestStage> page = requestStageRepo.findAllByRequestId(requestId, pageable);
+		
+		PageModel<RequestStage> pm = new PageModel<RequestStage>((int)page.getTotalElements(), page.getSize(), page.getTotalPages(), page.getContent());
+		return pm;
 	}
 	
 }
