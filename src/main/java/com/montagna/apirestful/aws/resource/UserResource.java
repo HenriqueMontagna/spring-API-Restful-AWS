@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.montagna.apirestful.aws.DTO.UserLoginDTO;
+import com.montagna.apirestful.aws.DTO.UserSaveDTO;
+import com.montagna.apirestful.aws.DTO.UserUpdateDTO;
 import com.montagna.apirestful.aws.DTO.UserUpdateRoleDTO;
 import com.montagna.apirestful.aws.domain.Request;
 import com.montagna.apirestful.aws.domain.User;
@@ -35,15 +37,16 @@ public class UserResource {
 	private RequestService requestService;
 	
 	@PostMapping
-	public ResponseEntity<User> save(@RequestBody User user){
-		User createdUser = userService.save(user);
+	public ResponseEntity<User> save(@RequestBody @Valid UserSaveDTO userDTO){
+		User createdUser = userService.save(userDTO.transformToUser());
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody User user){
-		user.setId(id);
-		User updatedUser = userService.update(user);
+	public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody UserUpdateDTO userDTO){
+		User userToUpdated = userDTO.transformToUser();
+		userToUpdated.setId(id);
+		User updatedUser = userService.update(userToUpdated);
 		return ResponseEntity.ok(updatedUser);
 	}
 	
@@ -86,7 +89,7 @@ public class UserResource {
 	@PatchMapping(value = "/role/{id}")
 	public ResponseEntity<?> updateRole(
 			@PathVariable("id") Long id,
-			@RequestBody UserUpdateRoleDTO userDTO){
+			@RequestBody @Valid UserUpdateRoleDTO userDTO){
 		User user = new User();
 		user.setId(id);
 		user.setRole(userDTO.getRole());
