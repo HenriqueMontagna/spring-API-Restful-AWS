@@ -60,4 +60,8 @@ public class UserService {
 		Optional<User> loggedUser = repo.login(email, password);
 		return loggedUser.get();
 	}
+	
+	public int updateUserRole(User user) {
+		return repo.updateRole(user.getId(), user.getRole());
+	}
 }

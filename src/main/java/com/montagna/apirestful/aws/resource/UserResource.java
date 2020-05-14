@@ -1,12 +1,10 @@
 package com.montagna.apirestful.aws.resource;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.montagna.apirestful.aws.DTO.UserLoginDTO;
+import com.montagna.apirestful.aws.DTO.UserUpdateRoleDTO;
 import com.montagna.apirestful.aws.domain.Request;
 import com.montagna.apirestful.aws.domain.User;
 import com.montagna.apirestful.aws.model.PageModel;
@@ -54,8 +53,8 @@ public class UserResource {
 	
 	@GetMapping
 	public ResponseEntity<PageModel<User>> listAllOnLazyMode(
-			@RequestParam(name = "page") int page,
-			@RequestParam(name = "size") int size){
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "10") int size){
 		
 		PageRequestModel pr = new PageRequestModel(page, size);
 		PageModel<User> pm = userService.listAllOnLazyMode(pr);
@@ -66,8 +65,8 @@ public class UserResource {
 	@GetMapping("/{userId}/requests")
 	public ResponseEntity<PageModel<Request>> listAllRequestsById(
 			@PathVariable("userId") Long id,
-			@RequestParam("page") int page,
-			@RequestParam("size") int size){
+			@RequestParam(name = "page", defaultValue = "0") int page,
+			@RequestParam(name = "size", defaultValue = "10") int size){
 		
 		PageRequestModel pr = new PageRequestModel(page, size);
 		PageModel<Request> pm = requestService.listByOwnerIdOnLazyLoading(id, pr);
@@ -80,5 +79,19 @@ public class UserResource {
 	public ResponseEntity<User> login(@RequestBody UserLoginDTO user){
 		User loggedUser = userService.login(user.getEmail(), user.getPassword());
 		return ResponseEntity.ok(loggedUser);
+	}
+	
+	@PatchMapping(value = "/role/{id}")
+	public ResponseEntity<?> updateRole(
+			@PathVariable("id") Long id,
+			@RequestBody UserUpdateRoleDTO userDTO){
+		User user = new User();
+		user.setId(id);
+		user.setRole(userDTO.getRole());
+		
+		userService.updateUserRole(user);
+		User updatedUser = userService.getById(id);
+		
+		return ResponseEntity.ok(updatedUser);
 	}
 }
