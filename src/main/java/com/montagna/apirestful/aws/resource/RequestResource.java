@@ -2,6 +2,8 @@ package com.montagna.apirestful.aws.resource;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.montagna.apirestful.aws.DTO.RequestSaveDTO;
+import com.montagna.apirestful.aws.DTO.RequestUpdateDTO;
 import com.montagna.apirestful.aws.domain.Request;
 import com.montagna.apirestful.aws.domain.RequestStage;
 import com.montagna.apirestful.aws.domain.User;
@@ -34,13 +38,14 @@ public class RequestResource {
 	private RequestStageService requestStageService;
 	
 	@PostMapping
-	public ResponseEntity<Request> save(@RequestBody Request request){
-		Request createdRequest = requestService.save(request);
+	public ResponseEntity<Request> save(@RequestBody @Valid RequestSaveDTO requestDTO){
+		Request createdRequest = requestService.save(requestDTO.transformToRequest());
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
 	}
 	
 	@PutMapping("/{requestId}")
-	public ResponseEntity<Request> update(@PathVariable("requestId") Long id ,@RequestBody Request request){
+	public ResponseEntity<Request> update(@PathVariable("requestId") Long id ,@RequestBody @Valid RequestUpdateDTO requestDTO){
+		Request request = requestDTO.transformToRequest();
 		request.setId(id);
 		Request updatedRequest = requestService.update(request);
 		return ResponseEntity.ok(updatedRequest);
