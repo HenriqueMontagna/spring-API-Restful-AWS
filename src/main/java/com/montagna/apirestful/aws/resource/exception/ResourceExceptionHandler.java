@@ -1,6 +1,8 @@
 package com.montagna.apirestful.aws.resource.exception;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,8 +28,18 @@ public class ResourceExceptionHandler extends ResponseEntityExceptionHandler{
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		String defaultMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-		ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), defaultMessage, new Date());
+		List<String> errors = new ArrayList<String>();
+		
+		ex.getBindingResult().getAllErrors().forEach(error -> {
+			errors.add(error.getDefaultMessage());
+		});
+		
+		String defaultMessage = "Invalid field(s)";
+		ApiErrorList error = new ApiErrorList(
+				HttpStatus.BAD_REQUEST.value(), 
+				defaultMessage, 
+				new Date(), 
+				errors);
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
