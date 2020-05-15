@@ -6,8 +6,8 @@ import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class UserLoginDTO {
-
+public class UserLoginDTO{
+	
 	@Email(message = "Invalid Email Address")
 	private String email;
 	
